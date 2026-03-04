@@ -1,18 +1,4 @@
-import { useState } from 'react'
-
-const allNews = [
-  { id: 1, title: '양자 오류 수정 알고리즘 세계 최초 실증 성공', category: '양자기술', date: '2026.02.28', author: '김양자', desc: '서울대 차세대연구원 양자연구팀이 100큐비트 이상 규모의 양자 오류 수정 알고리즘을 세계 최초로 실증하는 데 성공했습니다.' },
-  { id: 2, title: '차세대 2nm 반도체 소자 동작 특성 규명', category: '반도체', date: '2026.02.22', author: '이반도체', desc: '2나노미터급 GAA 트랜지스터의 전기적 특성을 정밀 분석하여 설계 가이드라인을 제시했습니다.' },
-  { id: 3, title: '합성생물학 기반 바이오플라스틱 생산 효율 10배 향상', category: '생명과학', date: '2026.02.18', author: '박생명', desc: '유전자 편집 기술로 미생물을 최적화하여 생분해성 바이오플라스틱 생산 효율을 기존 대비 10배 높이는 데 성공했습니다.' },
-  { id: 4, title: 'SNU 소형 위성 큐브샛 3기 궤도 진입 성공', category: '우주과학', date: '2026.02.12', author: '최우주', desc: '서울대학교차세대연구원이 독자 개발한 6U 큐브샛 3기가 500km 저궤도에 안착하여 지구 관측 데이터 전송을 시작했습니다.' },
-  { id: 5, title: '핵융합 플라즈마 제어 AI 모델 개발', category: '에너지', date: '2026.02.07', author: '정에너지', desc: '토카막 핵융합 장치에서 플라즈마 불안정성을 실시간으로 예측하고 제어하는 딥러닝 모델을 개발하였습니다.' },
-  { id: 6, title: '국제 양자기술 협력 컨소시엄 SNU 주도로 출범', category: '국제협력', date: '2026.02.01', author: '한국제', desc: '미국 MIT, 영국 UCL, 독일 TU Munich 등 12개 기관이 참여하는 글로벌 양자기술 연구 컨소시엄이 SNU 주도로 공식 출범했습니다.' },
-  { id: 7, title: 'AI 기반 단백질 구조 예측 플랫폼 공개', category: '생명과학', date: '2026.01.28', author: '오바이오', desc: 'SNU 생명과학연구팀이 개발한 차세대 단백질 구조 예측 AI가 오픈소스로 공개되었습니다.' },
-  { id: 8, title: '2026 SNU 차세대 연구 심포지엄 개최', category: '국제협력', date: '2026.01.20', author: '홍보팀', desc: '서울대학교차세대연구원이 주관하는 연례 국제 심포지엄에 15개국 300여 명의 연구자가 참여했습니다.' },
-  { id: 9, title: '나노 에너지 소자 효율 세계 최고 수준 달성', category: '반도체', date: '2026.01.15', author: '나노팀', desc: '양자점 기반 나노 에너지 소자의 광전변환 효율이 42%를 달성하여 세계 최고 기록을 경신했습니다.' },
-]
-
-const categories = ['전체', '양자기술', '반도체', '생명과학', '우주과학', '에너지', '국제협력']
+import { useMemo, useState } from 'react'
 
 const categoryColors = {
   양자기술: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
@@ -21,10 +7,52 @@ const categoryColors = {
   우주과학: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
   에너지: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
   국제협력: 'bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300',
+  기타: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
 }
 
-export default function News() {
+function normalizeItems(apiItems) {
+  if (!Array.isArray(apiItems)) return []
+
+  return apiItems.map((item) => {
+    const date = new Date(item.publishedAt ?? item.createdAt ?? '')
+    const dateStr = Number.isNaN(date.getTime())
+      ? ''
+      : date.toLocaleDateString('ko-KR', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        })
+
+    const plain = String(item.content || '')
+      .replace(/[#*_>`]/g, '')
+      .replace(/\n+/g, ' ')
+      .trim()
+    const desc = plain.length <= 160 ? plain : `${plain.slice(0, 160)}…`
+
+    const category = item.hashtags?.[0] ?? '기타'
+
+    return {
+      id: item._id,
+      title: item.title,
+      category,
+      date: dateStr,
+      author: item.author,
+      desc,
+    }
+  })
+}
+
+export default function News({ items }) {
   const [active, setActive] = useState('전체')
+  const allNews = useMemo(() => normalizeItems(items), [items])
+
+  const categories = useMemo(() => {
+    const set = new Set()
+    allNews.forEach((n) => {
+      if (n.category) set.add(n.category)
+    })
+    return ['전체', ...Array.from(set)]
+  }, [allNews])
 
   const filtered = active === '전체' ? allNews : allNews.filter((n) => n.category === active)
 
@@ -63,13 +91,21 @@ export default function News() {
               className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-6 hover:shadow-lg transition-shadow duration-300 cursor-pointer"
             >
               <div className="flex items-center justify-between mb-4">
-                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${categoryColors[item.category] || 'bg-gray-100 text-gray-700'}`}>
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    categoryColors[item.category] || categoryColors['기타']
+                  }`}
+                >
                   {item.category}
                 </span>
                 <span className="text-gray-400 text-xs">{item.date}</span>
               </div>
-              <h3 className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">{item.title}</h3>
-              <p className="text-gray-500 dark:text-gray-400 text-sm line-clamp-2 mb-4">{item.desc}</p>
+              <h3 className="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
+                {item.title}
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm line-clamp-2 mb-4">
+                {item.desc}
+              </p>
               <p className="text-xs text-gray-400">by {item.author}</p>
             </article>
           ))}
@@ -83,4 +119,32 @@ export default function News() {
       </div>
     </div>
   )
+}
+
+export async function getServerSideProps() {
+  const base = process.env.VITE_HOME_SERVER_BASE_URL
+  const siteKey = process.env.VITE_SITE_KEY || 'snu'
+
+  if (!base) {
+    console.error('VITE_HOME_SERVER_BASE_URL is not set')
+    return { props: { items: [] } }
+  }
+
+  try {
+    const res = await fetch(`${base}/api/public/news?site=${siteKey}`)
+    if (!res.ok) {
+      console.error('Failed to fetch news from home_server', await res.text())
+      return { props: { items: [] } }
+    }
+
+    const json = await res.json()
+    return {
+      props: {
+        items: json?.data?.items ?? [],
+      },
+    }
+  } catch (err) {
+    console.error('Error fetching news from home_server', err)
+    return { props: { items: [] } }
+  }
 }
