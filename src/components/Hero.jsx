@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from 'next/link'
 
 const stats = [
   { value: "42", label: "연구 프로젝트" },
@@ -17,7 +17,6 @@ export default function Hero() {
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
         <div className="grid md:grid-cols-5 gap-10 items-center">
-          {/* Left: Text - takes 3 columns */}
           <div className="md:col-span-3">
             <span className="inline-block px-3 py-1 bg-white/20 text-white text-sm rounded-full mb-6 backdrop-blur-sm">
               2026년도 차세대 연구 프로그램 공개모집
@@ -33,7 +32,7 @@ export default function Hero() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                to="/about"
+                href="/about"
                 className="inline-flex items-center justify-center px-8 py-3.5 bg-white text-snu-green font-semibold rounded-2xl hover:bg-green-50 transition-colors duration-200 shadow-lg"
               >
                 기관 소개
@@ -52,7 +51,7 @@ export default function Hero() {
                 </svg>
               </Link>
               <Link
-                to="/research"
+                href="/research"
                 className="inline-flex items-center justify-center px-8 py-3.5 bg-white/10 text-white font-semibold rounded-2xl hover:bg-white/20 transition-colors duration-200 backdrop-blur-sm border border-white/30"
               >
                 연구 분야 보기
@@ -60,7 +59,6 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Right: Stats Panel - takes 2 columns */}
           <div className="md:col-span-2">
             <div className="bg-white/15 backdrop-blur-sm rounded-3xl p-6 border border-white/20">
               <p className="text-white/90 text-xs uppercase tracking-widest font-semibold mb-5">

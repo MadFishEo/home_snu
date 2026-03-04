@@ -1,25 +1,43 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+'use client'
+
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 const navItems = [
-  { label: "홈", path: "/" },
-  { label: "소개", path: "/about" },
-  { label: "연구", path: "/research" },
-  { label: "교육", path: "/education" },
-  { label: "소식", path: "/news" },
-  { label: "문의", path: "/contact" },
-];
+  { label: '홈', path: '/' },
+  { label: '소개', path: '/about' },
+  { label: '연구', path: '/research' },
+  { label: '교육', path: '/education' },
+  { label: '소식', path: '/news' },
+  { label: '문의', path: '/contact' },
+]
 
-export default function Header({ darkMode, setDarkMode }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const location = useLocation();
+export default function Header() {
+  const [darkMode, setDarkMode] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const pathname = usePathname()
+
+  useEffect(() => {
+    const stored = typeof window !== 'undefined' ? window.localStorage.getItem('darkMode') : null
+    if (stored === 'true') setDarkMode(true)
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem('darkMode', String(darkMode))
+    if (darkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [darkMode])
 
   return (
     <header className="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b-2 border-snu-green dark:border-snu-dark shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo - circle shape */}
-          <Link to="/" className="flex items-center gap-3 group">
+          <Link href="/" className="flex items-center gap-3 group">
             <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center shadow-md">
               <span className="text-black font-bold text-xs">SNU</span>
             </div>
@@ -27,22 +45,19 @@ export default function Header({ darkMode, setDarkMode }) {
               <p className="text-snu-green dark:text-green-400 font-bold text-lg leading-tight">
                 SNU Institute
               </p>
-              <p className="text-gray-500 dark:text-gray-400 text-xs">
-                서울대학교차세대연구원
-              </p>
+              <p className="text-gray-500 dark:text-gray-400 text-xs">서울대학교차세대연구원</p>
             </div>
           </Link>
 
-          {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
               <Link
                 key={item.path}
-                to={item.path}
+                href={item.path}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
-                  location.pathname === item.path
-                    ? "bg-snu-green text-white"
-                    : "text-gray-600 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-gray-800 hover:text-snu-green dark:hover:text-green-500"
+                  pathname === item.path
+                    ? 'bg-snu-green text-white'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-gray-800 hover:text-snu-green dark:hover:text-green-500'
                 }`}
               >
                 {item.label}
@@ -125,16 +140,16 @@ export default function Header({ darkMode, setDarkMode }) {
         </div>
 
         {menuOpen && (
-          <div className="md:hidden pb-4 border-t border-gray-100 dark:border-gray-800 mt-1 pt-3">
+          <div className="md:hidden pb-4 border-t border-gray-100 dark:border-gray-800 mt-1 pt-3 bg-white dark:bg-gray-900">
             {navItems.map((item) => (
               <Link
                 key={item.path}
-                to={item.path}
+                href={item.path}
                 onClick={() => setMenuOpen(false)}
                 className={`block px-4 py-2.5 rounded-lg text-sm font-medium mb-1 transition-colors ${
-                  location.pathname === item.path
-                    ? "bg-snu-green text-white"
-                    : "text-gray-600 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-gray-800"
+                  pathname === item.path
+                    ? 'bg-snu-green text-white'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-gray-800'
                 }`}
               >
                 {item.label}
@@ -144,5 +159,5 @@ export default function Header({ darkMode, setDarkMode }) {
         )}
       </div>
     </header>
-  );
+  )
 }

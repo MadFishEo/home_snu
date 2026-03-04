@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 
 const newsData = [
   {
@@ -83,7 +83,7 @@ export default function LatestNews() {
             </h2>
           </div>
           <Link
-            to="/news"
+            href="/news"
             className="inline-flex items-center text-snu-green dark:text-green-400 font-medium hover:underline"
           >
             전체 보기
