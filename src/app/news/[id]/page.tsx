@@ -6,9 +6,11 @@ import remarkGfm from 'remark-gfm'
 type ApiNewsItem = {
   _id: string
   title: string
+  slug?: string
   content: string
   author: string
   site: string
+  visible?: boolean
   status: 'draft' | 'published'
   publishedAt?: string
   createdAt?: string

@@ -72,7 +72,7 @@ export default async function LatestNews() {
               const highlight = idx === 0
               const dateVal = item.publishedAt ?? item.createdAt
               return (
-                <Link key={item._id} href={`/news/${item._id}`} className="flex gap-6 group">
+                <Link key={item._id} href={`/news/${item.slug || item._id}`} className="flex gap-6 group">
                   <div className="hidden sm:flex flex-col items-center flex-shrink-0 w-32">
                     <div className={`w-4 h-4 rounded-full border-2 z-10 mt-5 ${highlight ? 'bg-snu-green border-snu-green' : 'bg-white dark:bg-gray-800 border-green-300 dark:border-green-700'}`} />
                     <span className="text-xs text-gray-400 dark:text-gray-500 mt-2">{formatMonth(dateVal)}</span>
