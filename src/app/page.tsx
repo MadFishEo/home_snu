@@ -1,6 +1,6 @@
-import Hero from '@/components/Hero'
-import CoreAreas from '@/components/CoreAreas'
-import LatestNews from '@/components/LatestNews'
+import Hero from "@/components/Hero";
+import CoreAreas from "@/components/CoreAreas";
+import LatestNews from "@/components/LatestNews";
 
 export default function HomePage() {
   return (
@@ -9,6 +9,5 @@ export default function HomePage() {
       <CoreAreas />
       <LatestNews />
     </>
-  )
+  );
 }
-

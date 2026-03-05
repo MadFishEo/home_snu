@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 type ApiNewsItem = {
   _id: string
@@ -32,7 +34,7 @@ async function fetchNewsDetail(id: string) {
   const base = process.env.VITE_HOME_SERVER_BASE_URL
   if (!base) return null
 
-  const res = await fetch(`${base}/api/news/${id}`, {
+  const res = await fetch(`${base}/api/public/news/${id}`, {
     cache: 'no-store',
   })
 
@@ -79,7 +81,6 @@ export default async function NewsDetailPage({ params }: PageProps) {
   if (!item) notFound()
 
   const dateLabel = formatDate(item.publishedAt ?? item.createdAt)
-  const plainContent = item.content.replace(/\r\n/g, '\n')
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -106,9 +107,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
 
       <article className="max-w-4xl mx-auto px-4 py-10">
         <div className="prose prose-neutral max-w-none dark:prose-invert">
-          {plainContent.split('\n').map((line, idx) => (
-            <p key={idx}>{line}</p>
-          ))}
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.content}</ReactMarkdown>
         </div>
       </article>
     </main>
