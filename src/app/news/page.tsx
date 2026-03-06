@@ -11,9 +11,11 @@ export const metadata: Metadata = {
 type ApiNewsItem = {
   _id: string;
   title: string;
+  slug?: string;
   content: string;
   author: string;
   site: string;
+  visible?: boolean;
   publishedAt?: string;
   createdAt?: string;
   hashtags?: string[];
@@ -38,7 +40,7 @@ function toDisplayItem(item: ApiNewsItem): NewsItem {
   const category = item.hashtags?.[0] ?? "기타";
 
   return {
-    id: item._id,
+    id: item.slug || item._id,
     title: item.title,
     category,
     date: dateStr,
