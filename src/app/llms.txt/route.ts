@@ -1,28 +1,38 @@
-export function GET() {
-  const content = `# SNU Institute - 서울대학교차세대연구원
+export const dynamic = "force-dynamic";
 
-> 서울대학교차세대연구원은 2005년 설립된 차세대 기술 연구 전문기관으로, 양자기술·차세대 반도체·우주과학·생명과학·미래에너지 분야에서 인류의 미래를 열어갑니다. 연구원 380+, 국제 특허 1,200+, 국제 협력 15개국.
+const FALLBACK = `# SNU Institute - 서울대학교차세대연구원
 
-## Pages
-
-- [홈](https://snu.cultzup.com/): 메인 페이지. 히어로 섹션, 핵심 연구 분야 소개, 최신 소식 목록을 제공합니다.
-
-- [기관 소개](https://snu.cultzup.com/about): 서울대학교차세대연구원의 사명과 비전, 주요 연혁(2005~2026), 핵심 비전(초융합 그랜드 챌린지, 개방형 글로벌 연구 허브, 미래 인재 양성 생태계)을 소개합니다. 설립 2005년, 연구원 380+, 국제 특허 1,200+, 국제 협력 15개국.
-
-- [연구 프로그램](https://snu.cultzup.com/research): 6개 연구 분야를 소개합니다. 양자컴퓨팅(12개 프로젝트), 차세대반도체(10개), 우주과학(8개), 핵융합에너지(7개), 합성생물학(9개), 나노기술(6개). 기술이전 56건, 국제 협력 15개국.
-
-- [교육 프로그램](https://snu.cultzup.com/education): 학위 과정(학사 4년, 석사 2년, 박사 4-5년)과 온라인 강좌(양자컴퓨팅 입문, 차세대 반도체 소자 이론, 합성생물학과 유전체 편집, 핵융합 에너지 기술) 정보를 제공합니다.
-
-- [소식](https://snu.cultzup.com/news): 서울대학교차세대연구원의 최신 뉴스, 연구 성과, 공지사항 목록 페이지입니다.
-
-- [소식 상세](https://snu.cultzup.com/news/[id]): 개별 소식의 상세 내용을 마크다운 형식으로 보여줍니다.
-
-- [연락처](https://snu.cultzup.com/contact): 서울대학교차세대연구원 연락처 및 문의 정보를 제공합니다.
+> llms.txt 컨텐츠가 아직 등록되지 않았습니다.
 `;
+
+export async function GET() {
+  const base = process.env.VITE_HOME_SERVER_BASE_URL;
+  const siteKey = process.env.VITE_SITE_KEY ?? "snu";
+
+  let content = FALLBACK;
+
+  if (base) {
+    try {
+      const res = await fetch(`${base}/api/public/llms-txt?site=${siteKey}`, {
+        next: { revalidate: 60 },
+      });
+      if (res.ok) {
+        const json = (await res.json()) as {
+          success: boolean;
+          data?: { content?: string };
+        };
+        if (json.success && json.data?.content) {
+          content = json.data.content;
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch llms.txt from home_server:", err);
+    }
+  }
 
   return new Response(content, {
     headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
+      "Content-Type": "text/plain; charset=utf-8",
     },
   });
 }

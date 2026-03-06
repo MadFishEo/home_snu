@@ -18,7 +18,7 @@ type ApiNewsItem = {
 }
 
 type PageProps = {
-  params: { id: string }
+  params: Promise<{ slug: string }>
 }
 
 function formatDate(value?: string) {
@@ -32,11 +32,11 @@ function formatDate(value?: string) {
   })
 }
 
-async function fetchNewsDetail(id: string) {
+async function fetchNewsDetail(slug: string) {
   const base = process.env.VITE_HOME_SERVER_BASE_URL
   if (!base) return null
 
-  const res = await fetch(`${base}/api/public/news/${id}`, {
+  const res = await fetch(`${base}/api/public/news/${slug}`, {
     cache: 'no-store',
   })
 
@@ -58,11 +58,10 @@ async function fetchNewsDetail(id: string) {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const item = await fetchNewsDetail(params.id)
+  const { slug } = await params
+  const item = await fetchNewsDetail(slug)
   if (!item) {
-    return {
-      title: '소식을 찾을 수 없습니다',
-    }
+    return { title: '페이지를 찾을 수 없습니다' }
   }
 
   const plain = item.content.replace(/[#*_>`]/g, '').replace(/\n+/g, ' ').trim()
@@ -78,8 +77,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-export default async function NewsDetailPage({ params }: PageProps) {
-  const item = await fetchNewsDetail(params.id)
+export default async function SlugPage({ params }: PageProps) {
+  const { slug } = await params
+  const item = await fetchNewsDetail(slug)
   if (!item) notFound()
 
   const dateLabel = formatDate(item.publishedAt ?? item.createdAt)
@@ -115,4 +115,3 @@ export default async function NewsDetailPage({ params }: PageProps) {
     </main>
   )
 }
-

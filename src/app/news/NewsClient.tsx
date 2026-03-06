@@ -71,7 +71,7 @@ export default function NewsClient({ initialItems }: Props) {
           {filtered.map((item) => (
             <Link
               key={item.id}
-              href={`/news/${item.id}`}
+              href={`/${item.id}`}
               className="block bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-6 hover:shadow-lg transition-shadow duration-300 cursor-pointer"
             >
               <div className="flex items-center justify-between mb-4">
