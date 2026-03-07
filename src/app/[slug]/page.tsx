@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw'
 
 type ApiNewsItem = {
   _id: string
@@ -109,7 +110,9 @@ export default async function SlugPage({ params }: PageProps) {
 
       <article className="max-w-4xl mx-auto px-4 py-10">
         <div className="prose prose-neutral max-w-none dark:prose-invert">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{item.content}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+            {item.content}
+          </ReactMarkdown>
         </div>
       </article>
     </main>
